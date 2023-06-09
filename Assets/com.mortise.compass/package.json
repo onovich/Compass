@@ -1,0 +1,19 @@
+{
+    "name": "com.mortise.compass",
+    "version": "0.0.0",
+    "unity": "2019.4",
+    "author": {
+        "name": "onovich",
+        "email": "onovich1110@gmail.com"
+    },
+    "displayName": "MortiseFrame.Compass",
+    "description": "A pathfinding library.",
+    "documentationURL": "https://github.com/onovich/Compass",
+    "hideInEditor": false,
+    "category": "Easing",
+    "keywords": [
+        "MortiseFrame",
+        "pathfinding"
+    ],
+    "unityRelease": "16f1"
+}

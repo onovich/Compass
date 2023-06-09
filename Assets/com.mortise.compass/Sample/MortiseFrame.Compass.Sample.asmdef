@@ -1,0 +1,16 @@
+{
+    "name": "MortiseFrame.Compass.Sample",
+    "rootNamespace": "",
+    "references": [
+        "GUID:986c2a652687d674d87d43e6b2a2c7ad"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
