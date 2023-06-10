@@ -37,6 +37,7 @@ namespace MortiseFrame.Compass.Sample {
                 var x = (int)obstacle.X;
                 var y = (int)obstacle.Y;
                 grid[x, y].Init(x, y, obstacle.Walkable);
+                Debug.Log($"添加障碍物:x={x},y={y}");
             }
 
             EditorUtility.SetDirty(this);
@@ -54,7 +55,7 @@ namespace MortiseFrame.Compass.Sample {
             var arr = new Node2D[goes.Length];
             for (int i = 0; i < goes.Length; i++) {
                 var go = goes[i];
-                var node = go.GetNode2D();
+                var node = go.GetNode();
                 arr[i] = node;
             }
             return arr;
@@ -75,9 +76,10 @@ namespace MortiseFrame.Compass.Sample {
                         Gizmos.color = cellColor_walkable;
                     } else {
                         Gizmos.color = cellColor_unwalkable;
+                        Gizmos.DrawCube(pos, cellSize);
                     }
-                    Gizmos.DrawCube(pos, cellSize);
-                    Gizmos.color = cellColor_border;
+                    // Gizmos.DrawCube(pos, cellSize);
+                    // Gizmos.color = cellColor_border;
                     Gizmos.DrawWireCube(pos, cellSize);
                 }
             }
