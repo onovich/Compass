@@ -13,15 +13,16 @@ namespace MortiseFrame.Compass.Sample {
             return node;
         }
 
-        void OnDrawGizmos() {
+        // void OnDrawGizmos() {
 
-            var color = Color.blue;
-            var pos = transform.localPosition;
-            // color.a = 1 / 2;
-            var size = Vector3.one;
-            Gizmos.DrawCube(pos, size);
+        //     var color = Color.blue;
+        //     color.a = 0.5f;
+        //     Gizmos.color = color;
+        //     var pos = transform.localPosition;
+        //     var size = Vector3.one;
+        //     Gizmos.DrawCube(pos, size);
 
-        }
+        // }
 
     }
 

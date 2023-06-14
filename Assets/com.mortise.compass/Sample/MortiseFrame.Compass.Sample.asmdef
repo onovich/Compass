@@ -2,7 +2,8 @@
     "name": "MortiseFrame.Compass.Sample",
     "rootNamespace": "",
     "references": [
-        "GUID:986c2a652687d674d87d43e6b2a2c7ad"
+        "GUID:986c2a652687d674d87d43e6b2a2c7ad",
+        "GUID:a8c89cb741acd6c4fb0a2cfbab7580dc"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

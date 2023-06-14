@@ -14,14 +14,22 @@ namespace MortiseFrame.Compass {
 
         Func<Node2D, Node2D, float> heuristicFunc;
 
-        Node2D[,] grid;
+        bool[] grid;
         int width;
         int height;
 
         public void FromTM(GridTM tm) {
-            this.grid = tm.grid;
+            this.grid = tm.Grid;
             this.width = tm.width;
             this.height = tm.height;
+        }
+
+        public bool GetGridValue(int x, int y) {
+            return grid[x + y * width];
+        }
+
+        public void SetGridValue(int x, int y, bool value) {
+            grid[x + y * width] = value;
         }
 
         public Compass2D(GridTM tm, HeuristicType type = HeuristicType.Euclidean) {
@@ -71,7 +79,7 @@ namespace MortiseFrame.Compass {
                     int checkX = node.X + x;
                     int checkY = node.Y + y;
                     if (checkX >= 0 && checkX < width && checkY >= 0 && checkY < height) {
-                        var walkable = grid[checkX, checkY].Walkable;
+                        var walkable = GetGridValue(checkX, checkY);
                         neighbors.Add(pool.Get(checkX, checkY, walkable));
                     }
                 }
@@ -89,8 +97,8 @@ namespace MortiseFrame.Compass {
             // Assume all nodes in the grid are returned to the pool
             pool.ReturnAll();
 
-            var walkableOfStart = grid[start.X, start.Y].Walkable;
-            var walkableOfTarget = grid[target.X, target.Y].Walkable;
+            var walkableOfStart = GetGridValue(start.X, start.Y);
+            var walkableOfTarget = GetGridValue(target.X, target.Y);
             Node2D startNode = pool.Get(start.X, start.Y, walkableOfStart);
             Node2D targetNode = pool.Get(target.X, target.Y, walkableOfTarget);
 
