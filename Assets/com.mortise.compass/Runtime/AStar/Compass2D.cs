@@ -15,21 +15,21 @@ namespace MortiseFrame.Compass {
         Func<Node2D, Node2D, float> heuristicFunc;
 
         bool[] grid;
-        int width;
-        int height;
+        int countX;
+        int countY;
 
         public void FromTM(GridTM tm) {
-            this.grid = tm.Grid;
-            this.width = tm.width;
-            this.height = tm.height;
+            this.grid = tm.WalkableValue;
+            this.countX = tm.countX;
+            this.countY = tm.countY;
         }
 
         public bool GetGridValue(int x, int y) {
-            return grid[x + y * width];
+            return grid[x + y * countX];
         }
 
         public void SetGridValue(int x, int y, bool value) {
-            grid[x + y * width] = value;
+            grid[x + y * countX] = value;
         }
 
         public Compass2D(GridTM tm, HeuristicType type = HeuristicType.Euclidean) {
@@ -78,7 +78,7 @@ namespace MortiseFrame.Compass {
                     if (x == 0 && y == 0) continue;
                     int checkX = node.X + x;
                     int checkY = node.Y + y;
-                    if (checkX >= 0 && checkX < width && checkY >= 0 && checkY < height) {
+                    if (checkX >= 0 && checkX < countX && checkY >= 0 && checkY < countY) {
                         var walkable = GetGridValue(checkX, checkY);
                         neighbors.Add(pool.Get(checkX, checkY, walkable));
                     }

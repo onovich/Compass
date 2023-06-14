@@ -7,29 +7,42 @@ namespace MortiseFrame.Compass {
     [Serializable]
     public class GridTM {
 
-        [SerializeField] bool[] grid;
-        public bool[] Grid => grid;
-        public void SetGrid(bool[] value) => grid = value;
-        public void ClearGrid() => grid = null;
+        [SerializeField] bool[] walkableValue;
+        public bool[] WalkableValue => walkableValue;
+        public void SetWalkableValue(bool[] value) => walkableValue = value;
+        public void ClearWalkableValue() => walkableValue = null;
 
-        public int width;
-        public int height;
+        public int countX;
+        public int countY;
 
-        public float cellWidth;
-        public float cellHeight;
+        public bool GetWalkableValueWithIndex(Vector2Int index) {
+            var x = index.x;
+            var y = index.y;
+            var i = x + y * countX;
 
-        public bool GetGridValue(int x, int y) {
-            return grid[x + y * width];
+            if (walkableValue[i] == false) {
+                // Debug.Log($"SetWalkableValueWithIndex: x = {x}; y = {y}; i = {i}; value = {false}; walkableValue[i] = {walkableValue[i]}");
+            }
+            return walkableValue[x + y * countX];
         }
 
-        public void SetGridValue(int x, int y, bool value) {
-            grid[x + y * width] = value;
+        public void SetWalkableValueWithIndex(Vector2Int index, bool value) {
+            var x = index.x;
+            var y = index.y;
+            var i = x + y * countX;
+            if (value == false) {
+                Debug.Log($"SetWalkableValueWithIndex: x = {x}; y = {y}; i = {i}; value = {value}; walkableValue[i] = {walkableValue[i]}");
+            }
+            if (i >= walkableValue.Length) {
+                Debug.LogError($"Index out of range: x = {x}; y = {y}; i = {i}");
+            }
+            walkableValue[i] = value;
         }
 
-        public Vector2 GetLocalPosition(int x, int y) {
-            var localX = x + cellWidth / 2;
-            var localY = y + cellHeight / 2;
-            return new Vector2(localX, localY);
+        public void Clear() {
+            walkableValue = null;
+            countX = 0;
+            countY = 0;
         }
 
     }

@@ -13,69 +13,52 @@ namespace MortiseFrame.Compass.Sample {
     public class GridEditor : MonoBehaviour {
 
         [Header("输出")] public GridSampleSO model;
+        [Header("覆盖单位数")] public Vector2Int UnitCount = new Vector2Int(10, 10);
+        [Header("每单位网格数")] public int MPU = 1;
 
-        [Header("网格尺寸")] public Vector2Int gridSize = new Vector2Int(10, 10);
-
-        [Header("格子尺寸")] public Vector2 cellSize = new Vector2(1, 1);
-
-        [Header("可通行颜色")] public Color cellColor_walkable = Color.white;
-        [Header("不可通行颜色")] public Color cellColor_unwalkable = Color.red;
-        [Header("边框颜色")] public Color cellColor_border = Color.black;
-
-        Vector2 overLapPos = Vector2.zero;
+        Vector2Int cellCount;
+        Vector2 cellSize;
 
         AABB[,] cellAABBs;
         List<AABB> obstacles_box_aabb;
         List<OBB> obstacles_box_obb;
         List<Circle> obstacles_circle;
 
-        [ContextMenu("烘焙网格")]
-        void SaveGrid() {
+        bool isBaked = false;
+
+        [ContextMenu("一键烘焙")]
+        void SaveAsset() {
+
+            isBaked = false;
+
+            ClearGrid();
+            ClearObstacle();
+            ClearIntersectInfo();
 
             BakeGrid();
-
-            EditorUtility.SetDirty(this);
-            EditorUtility.SetDirty(model);
-
-        }
-
-        [ContextMenu("烘焙障碍物")]
-        void SaveObstacle() {
-
             BakeObstacleArray();
-
-            EditorUtility.SetDirty(this);
-            EditorUtility.SetDirty(model);
-
-        }
-
-        [ContextMenu("烘焙碰撞信息")]
-        void SaveIntersectInfo() {
-
             BakeIntersectInfo();
 
             EditorUtility.SetDirty(this);
             EditorUtility.SetDirty(model);
 
+            isBaked = true;
+
         }
 
-        [ContextMenu("清除网格")]
         void ClearGrid() {
 
-            model.tm.ClearGrid();
-            cellAABBs = null;
-            obstacles_box_aabb = null;
-            obstacles_box_obb = null;
-            obstacles_circle = null;
+            model.tm.ClearWalkableValue();
+            model.tm.Clear();
 
             EditorUtility.SetDirty(this);
             EditorUtility.SetDirty(model);
 
         }
 
-        [ContextMenu("清除障碍物")]
         void ClearObstacle() {
 
+            obstacles_box_aabb?.Clear();
             obstacles_box_aabb = null;
             obstacles_box_obb = null;
             obstacles_circle = null;
@@ -85,21 +68,24 @@ namespace MortiseFrame.Compass.Sample {
 
         }
 
-        [ContextMenu("清除碰撞信息")]
         void ClearIntersectInfo() {
 
-            for (int x = 0; x < cellAABBs.GetLength(0); x++) {
-                for (int y = 0; y < cellAABBs.GetLength(1); y++) {
-                    model.tm.SetGridValue(x, y, true);
-                }
+            if (cellAABBs == null) {
+                return;
             }
+
+            cellAABBs = null;
 
             EditorUtility.SetDirty(this);
             EditorUtility.SetDirty(model);
 
         }
 
-        void BakeIntersectInfo() {
+        void BakeAABB() {
+
+            if (obstacles_box_aabb == null || obstacles_box_aabb.Count == 0) {
+                return;
+            }
 
             for (int i = 0; i < obstacles_box_aabb.Count; i++) {
 
@@ -112,13 +98,24 @@ namespace MortiseFrame.Compass.Sample {
                         var intersect = Intersect2DUtil.IsIntersectAABB_AABB(cell_aabb, obstacle_aabb, float.Epsilon);
 
                         if (intersect) {
-                            model.tm.SetGridValue(x, y, false);
+                            var index = new Vector2Int(x, y);
+                            model.tm.SetWalkableValueWithIndex(index, false);
+                            EditorUtility.SetDirty(model);
+
                             Debug.Log($"AABB 碰撞: {x},{y}");
                         }
 
                     }
                 }
 
+            }
+
+        }
+
+        void BakeOBB() {
+
+            if (obstacles_box_obb == null || obstacles_box_obb.Count == 0) {
+                return;
             }
 
             for (int i = 0; i < obstacles_box_obb.Count; i++) {
@@ -132,11 +129,20 @@ namespace MortiseFrame.Compass.Sample {
                         var intersect = Intersect2DUtil.IsIntersectAABB_OBB(cell_aabb, obstacle_obb, float.Epsilon);
 
                         if (intersect) {
-                            model.tm.SetGridValue(x, y, false);
+                            var index = new Vector2Int(x, y);
+                            model.tm.SetWalkableValueWithIndex(index, false);
                         }
                     }
                 }
 
+            }
+
+        }
+
+        void BakeCircle() {
+
+            if (obstacles_circle == null || obstacles_circle.Count == 0) {
+                return;
             }
 
             for (int i = 0; i < obstacles_circle.Count; i++) {
@@ -150,7 +156,8 @@ namespace MortiseFrame.Compass.Sample {
                         var intersect = Intersect2DUtil.IsIntersectAABB_Circle(cell_aabb, obstacle_circle, float.Epsilon);
 
                         if (intersect) {
-                            model.tm.SetGridValue(x, y, false);
+                            var index = new Vector2Int(x, y);
+                            model.tm.SetWalkableValueWithIndex(index, false);
                         }
                     }
                 }
@@ -159,25 +166,37 @@ namespace MortiseFrame.Compass.Sample {
 
         }
 
+        void BakeIntersectInfo() {
+
+            BakeAABB();
+            BakeOBB();
+            BakeCircle();
+
+        }
+
         void BakeGrid() {
 
-            var grid = new bool[gridSize.x * gridSize.y];
-            model.tm.SetGrid(grid);
-            cellAABBs = new AABB[gridSize.x, gridSize.y];
+            cellSize = new Vector2(1 / (float)MPU, 1 / (float)MPU);
+            cellCount = new Vector2Int(UnitCount.x * MPU, UnitCount.y * MPU);
 
-            for (int x = 0; x < gridSize.x; x++) {
-                for (int y = 0; y < gridSize.y; y++) {
-                    model.tm.SetGridValue(x, y, true);
-                    var cell_aabb = Cell2AABB(x, y);
+            model.tm.countX = cellCount.x;
+            model.tm.countY = cellCount.y;
+
+            var grid = new bool[cellCount.x * cellCount.y];
+            Debug.Log($"网格大小: {cellCount.x},{cellCount.y}");
+            model.tm.SetWalkableValue(grid);
+            cellAABBs = new AABB[cellCount.x, cellCount.y];
+
+            for (int x = 0; x < cellCount.x; x++) {
+                for (int y = 0; y < cellCount.y; y++) {
+                    var index = new Vector2Int(x, y);
+                    var pos = Index2GizmosCenter(index);
+                    model.tm.SetWalkableValueWithIndex(index, true);
+                    var cell_aabb = Index2AABB(x, y);
                     cellAABBs[x, y] = cell_aabb;
                 }
             }
 
-            model.tm.width = gridSize.x;
-            model.tm.height = gridSize.y;
-
-            model.tm.cellWidth = cellSize.x;
-            model.tm.cellHeight = cellSize.y;
             Debug.Log($"网格大小: {cellSize.x},{cellSize.y}");
 
         }
@@ -258,15 +277,16 @@ namespace MortiseFrame.Compass.Sample {
             var max = new Vector2(xMax, yMax);
             var aabb = new AABB(min, max);
 
-            Debug.Log($"aabb: {collider.transform.position.x},{collider.transform.position.y},{size.x},{size.y},xmin:{xMin},xmax:{xMax},ymin:{yMin},ymax:{yMax}");
+            // Debug.Log($"aabb: {collider.transform.position.x},{collider.transform.position.y},{size.x},{size.y},xmin:{xMin},xmax:{xMax},ymin:{yMin},ymax:{yMax}");
             return aabb;
         }
 
-        AABB Cell2AABB(int x, int y) {
-            var xMin = (int)(x * cellSize.x);
-            var xMax = (int)((x + 1) * cellSize.x);
-            var yMin = (int)(y * cellSize.y);
-            var yMax = (int)((y + 1) * cellSize.y);
+        AABB Index2AABB(int x, int y) {
+            var offset = cellSize / 2;
+            var xMin = x * cellSize.x - offset.x;
+            var xMax = x * cellSize.x + offset.x;
+            var yMin = y * cellSize.y - offset.y;
+            var yMax = y * cellSize.y + offset.y;
             var min = new Vector2(xMin, yMin);
             var max = new Vector2(xMax, yMax);
             var cell_aabb = new AABB(min, max);
@@ -274,26 +294,59 @@ namespace MortiseFrame.Compass.Sample {
         }
 
         void OnDrawGizmos() {
-            if (model == null || model.tm == null || model.tm.Grid == null) {
+
+            if (!isBaked || model == null || model.tm == null || model.tm.WalkableValue == null) {
                 return;
             }
-            for (int x = 0; x < gridSize.x; x++) {
-                for (int y = 0; y < gridSize.y; y++) {
-                    if (model.tm.GetGridValue(x, y)) {
-                        var worldPos = model.tm.GetLocalPosition(x, y) + (Vector2)transform.position;
-                        Gizmos.color = cellColor_walkable;
-                        Gizmos.DrawWireCube(worldPos, cellSize);
+
+            DrawGrid();
+
+        }
+
+        void DrawGrid() {
+
+            for (int i = 0; i < cellCount.x; i++) {
+
+                for (int j = 0; j < cellCount.y; j++) {
+
+                    var index = new Vector2Int(i, j);
+                    var walkable = model.tm.GetWalkableValueWithIndex(index);
+
+                    if (walkable) {
+
+                        Gizmos.color = Color.white;
+                        var pos = Index2GizmosCenter(index);
+                        Gizmos.DrawWireCube(pos, cellSize);
+
                     } else {
-                        Gizmos.color = cellColor_unwalkable;
-                        var worldPos = model.tm.GetLocalPosition(x, y) + (Vector2)transform.position;
-                        Gizmos.DrawWireCube(worldPos, cellSize);
-                        var min = Vector2.zero - cellSize / 2;
-                        var max = cellSize / 2;
-                        Gizmos.DrawLine(worldPos + new Vector2(min.x, min.y), worldPos + new Vector2(max.x, max.y));
-                        Gizmos.DrawLine(worldPos + new Vector2(min.x, max.y), worldPos + new Vector2(max.x, min.y));
+
+                        Gizmos.color = Color.red;
+                        var pos = Index2GizmosCenter(index);
+                        Gizmos.DrawWireCube(pos, cellSize);
+
+                        var localMin = Vector2.zero - cellSize / 2;
+                        var localMax = cellSize / 2;
+
+                        var min = pos + localMin;
+                        var max = pos + localMax;
+
+                        Gizmos.DrawLine(min, max);
+                        Gizmos.DrawLine(new Vector2(min.x, max.y), new Vector2(max.x, min.y));
+
                     }
+
                 }
+
             }
+
+
+        }
+
+        Vector2 Index2GizmosCenter(Vector2Int index) {
+
+            var cell_offset = cellSize / 2;
+            var pos = new Vector2(index.x * cellSize.x, index.y * cellSize.y) + cell_offset;
+            return pos;
 
         }
 
