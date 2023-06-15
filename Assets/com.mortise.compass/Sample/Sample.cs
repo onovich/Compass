@@ -4,7 +4,15 @@ using UnityEngine;
 
 namespace MortiseFrame.Compass.Sample {
 
+    [SerializeField]
+    public struct boolTM {
+        public bool[] value;
+    }
+
     public class Sample : MonoBehaviour {
+
+        [SerializeField]
+        boolTM[] tms;
 
         Compass2D compass;
         public Transform end;
@@ -32,15 +40,6 @@ namespace MortiseFrame.Compass.Sample {
             var endNode = Pos2Node(endPos);
             path = compass.FindPath(map, startNode, endNode);
 
-        }
-
-        float currentTime = 0f;
-        float interval = 0.5f;
-        void ResetCurrentTime() {
-            currentTime = 0f;
-        }
-        void SpendCurrentTime() {
-            currentTime += Time.deltaTime;
         }
 
         Map2D GetMap() {
