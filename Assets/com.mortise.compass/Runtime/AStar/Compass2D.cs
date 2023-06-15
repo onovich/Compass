@@ -1,142 +1,86 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace MortiseFrame.Compass {
     public class Compass2D {
 
-        Node2DPool pool;
-        PriorityQueue<Node2D> openList;
-        HashSet<Node2D> closedList;
-        Dictionary<Node2D, Node2D> cameFrom;
-        Dictionary<Node2D, float> gScore;
-        Dictionary<Node2D, float> fScore;
+        readonly List<Node2D> openList = new List<Node2D>();
+        readonly List<Node2D> closedList = new List<Node2D>();
+        readonly int[] dx = { -1, 1, 0, 0, -1, -1, 1, 1 };
+        readonly int[] dy = { 0, 0, -1, 1, -1, 1, -1, 1 };
 
-        Func<Node2D, Node2D, float> heuristicFunc;
+        // 启发式函数
+        readonly Func<Node2D, Node2D, float> heuristicFunc;
 
-        bool[] grid;
-        int countX;
-        int countY;
-
-        public void FromTM(GridTM tm) {
-            this.grid = tm.WalkableValue;
-            this.countX = tm.countX;
-            this.countY = tm.countY;
+        public Compass2D(HeuristicType type = HeuristicType.Euclidean) {
+            this.heuristicFunc = HeuristicUtil.GetHeuristic(type);
         }
 
-        public bool GetGridValue(int x, int y) {
-            return grid[x + y * countX];
-        }
+        public List<Node2D> FindPath(Map2D map, Node2D start, Node2D end) {
 
-        public void SetGridValue(int x, int y, bool value) {
-            grid[x + y * countX] = value;
-        }
-
-        public Compass2D(GridTM tm, HeuristicType type = HeuristicType.Euclidean) {
-            heuristicFunc = HeuristicUtil.GetHeuristic(type);
-            pool = new Node2DPool();
-            openList = new PriorityQueue<Node2D>();
-            closedList = new HashSet<Node2D>();
-            cameFrom = new Dictionary<Node2D, Node2D>();
-            gScore = new Dictionary<Node2D, float>();
-            fScore = new Dictionary<Node2D, float>();
-            FromTM(tm);
-        }
-
-        void ResetNode(Node2D node) {
-            cameFrom.Remove(node);
-            gScore.Remove(node);
-            fScore.Remove(node);
-            pool.ReturnNode(node);
-        }
-
-        void UpdateNode(Node2D current, Node2D neighbor, Node2D target, float newGScore) {
-            cameFrom[neighbor] = current;
-            gScore[neighbor] = newGScore;
-            fScore[neighbor] = gScore[neighbor] + heuristicFunc(neighbor, target);
-            if (openList.Contains(neighbor)) {
-                openList.UpdatePriority(neighbor, (int)fScore[neighbor]);
-            } else {
-                openList.Enqueue(neighbor, (int)fScore[neighbor]);
-            }
-        }
-
-        List<Node2D> ReconstructPath(Node2D current) {
-            List<Node2D> totalPath = new List<Node2D>();
-            while (cameFrom.ContainsKey(current)) {
-                totalPath.Add(current);
-                current = cameFrom[current];
-            }
-            totalPath.Reverse();
-            return totalPath;
-        }
-
-        List<Node2D> GenerateNeighbors(Node2D node) {
-            List<Node2D> neighbors = new List<Node2D>();
-            for (int x = -1; x <= 1; x++) {
-                for (int y = -1; y <= 1; y++) {
-                    if (x == 0 && y == 0) continue;
-                    int checkX = node.X + x;
-                    int checkY = node.Y + y;
-                    if (checkX >= 0 && checkX < countX && checkY >= 0 && checkY < countY) {
-                        var walkable = GetGridValue(checkX, checkY);
-                        neighbors.Add(pool.Get(checkX, checkY, walkable));
-                    }
-                }
-            }
-            return neighbors;
-        }
-
-        public List<Node2D> FindPath(Node2D start, Node2D target) {
             openList.Clear();
             closedList.Clear();
-            cameFrom.Clear();
-            gScore.Clear();
-            fScore.Clear();
-
-            // Assume all nodes in the grid are returned to the pool
-            pool.ReturnAll();
-
-            var walkableOfStart = GetGridValue(start.X, start.Y);
-            var walkableOfTarget = GetGridValue(target.X, target.Y);
-            Node2D startNode = pool.Get(start.X, start.Y, walkableOfStart);
-            Node2D targetNode = pool.Get(target.X, target.Y, walkableOfTarget);
-
-            gScore[startNode] = 0;
-            fScore[startNode] = heuristicFunc(startNode, targetNode);
-
-            openList.Enqueue(startNode, (int)fScore[startNode]);
+            openList.Add(start);
 
             while (openList.Count > 0) {
-                Node2D current = openList.Dequeue();
+                openList.Sort();
+                var currentNode = openList[0];
 
-                if (current.Equals(targetNode)) {
-                    var path = ReconstructPath(current);
+                if (currentNode.X == end.X && currentNode.Y == end.Y) {
+                    var path = GetPathFromNode(currentNode, start);
                     return path;
                 }
 
-                closedList.Add(current);
+                openList.Remove(currentNode);
+                closedList.Add(currentNode);
 
-                foreach (Node2D neighbor in GenerateNeighbors(current)) {
-                    if (closedList.Contains(neighbor) || !neighbor.Walkable) {
+                for (int i = 0; i < 8; i++) {
+                    int nx = currentNode.X + dx[i];
+                    int ny = currentNode.Y + dy[i];
+
+                    if (nx < 0 || nx >= map.Width || ny < 0 || ny >= map.Height) {
                         continue;
                     }
 
-                    float tentativeGScore = gScore[current] + heuristicFunc(current, neighbor);
+                    var neighbour = map.Nodes[nx, ny];
 
-                    if (!gScore.ContainsKey(neighbor) || tentativeGScore < gScore[neighbor]) {
-                        if (!cameFrom.ContainsKey(neighbor)) {
-                            cameFrom[neighbor] = pool.Get(neighbor.X, neighbor.Y, neighbor.Walkable);
-                        }
-                        UpdateNode(current, neighbor, targetNode, tentativeGScore);
+                    if (closedList.Contains(neighbour) || !neighbour.Walkable) {
+                        continue;
+                    }
+
+                    if (!openList.Contains(neighbour)) {
+                        openList.Add(neighbour);
+                        neighbour.SetG(currentNode.G + 1);
+                        neighbour.SetH(heuristicFunc(neighbour, end));
+                        neighbour.SetF(neighbour.G + neighbour.H);
+                        neighbour.SetParent(currentNode);
+                    } else if (neighbour.G > currentNode.G + 1) {
+                        var oldG = neighbour.G;
+                        var oldF = neighbour.F;
+                        neighbour.SetG(currentNode.G + 1);
+                        neighbour.SetF(neighbour.G + neighbour.H);
+                        neighbour.SetParent(currentNode);
+                        openList.Sort();
                     }
                 }
             }
 
-            // If no path was found, return all nodes back to the pool
-            pool.ReturnAll();
-
             return null;
+        }
+
+
+        private List<Node2D> GetPathFromNode(Node2D node, Node2D startNode) {
+            var path = new List<Node2D>();
+            while (node != null) {
+                if (node != startNode) {
+                    path.Add(node);
+                }
+                node = node.Parent;
+            }
+            path.Reverse();
+            return path;
         }
 
     }
