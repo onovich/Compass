@@ -166,7 +166,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   model: {fileID: 11400000, guid: 26c38f9f08f13f7408849d98c490c1c8, type: 2}
-  UnitCount: {x: 8, y: 20}
+  UnitCount: {x: 12, y: 20}
   MPU: 1
 --- !u!1001 &418816426851104340
 PrefabInstance:

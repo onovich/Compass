@@ -103,7 +103,7 @@ namespace MortiseFrame.Compass.Sample {
                             model.tm.SetWalkableValueWithIndex(index, false);
                             EditorUtility.SetDirty(model);
 
-                            Debug.Log($"AABB 碰撞: index: {x},{y} aabb:{cell_aabb.GetCenter().x},{cell_aabb.GetCenter().y} obstacle:{obstacle_aabb.GetCenter().x},{obstacle_aabb.GetCenter().y}s");
+                            // Debug.Log($"AABB 碰撞: index: {x},{y} aabb:{cell_aabb.GetCenter().x},{cell_aabb.GetCenter().y} obstacle:{obstacle_aabb.GetCenter().x},{obstacle_aabb.GetCenter().y}s");
                         }
 
                     }
