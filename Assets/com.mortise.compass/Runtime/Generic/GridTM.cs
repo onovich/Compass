@@ -14,12 +14,17 @@ namespace MortiseFrame.Compass {
 
         public int countX;
         public int countY;
+        public Vector2 cellSize;
+        public Vector2 stageOffset;
+        public int MPU;
 
         public bool GetWalkableValueWithIndex(Vector2Int index) {
             var x = index.x;
             var y = index.y;
             var i = x + y * countX;
-
+            if (i >= walkableValue.Length || i <= 0) {
+                Debug.LogError($"Index out of range: x = {x}; y = {y}; i = {i}");
+            }
             if (walkableValue[i] == false) {
                 // Debug.Log($"SetWalkableValueWithIndex: x = {x}; y = {y}; i = {i}; value = {false}; walkableValue[i] = {walkableValue[i]}");
             }
@@ -33,7 +38,7 @@ namespace MortiseFrame.Compass {
             if (value == false) {
                 // Debug.Log($"SetWalkableValueWithIndex: x = {x}; y = {y}; i = {i}; value = {value}; walkableValue[i] = {walkableValue[i]}");
             }
-            if (i >= walkableValue.Length) {
+            if (i >= walkableValue.Length || i <= 0) {
                 Debug.LogError($"Index out of range: x = {x}; y = {y}; i = {i}");
             }
             walkableValue[i] = value;

@@ -14,7 +14,8 @@ namespace MortiseFrame.Compass.Sample {
 
         [Header("输出")] public GridSampleSO model;
         [Header("覆盖单位数")] public Vector2Int UnitCount = new Vector2Int(10, 10);
-        [Header("每单位网格数")] public int MPU = 1;
+        [Header("每单位网格数(n x n)")] public int MPU = 1;
+        Vector2 stageOffset => new Vector2(-UnitCount.x * 0.5f, -UnitCount.y * 0.5f);
 
         Vector2Int cellCount;
         Vector2 cellSize;
@@ -130,10 +131,10 @@ namespace MortiseFrame.Compass.Sample {
 
                         if (intersect) {
                             var index = new Vector2Int(x, y);
-                            Debug.Log($"OBB 碰撞: index: {x},{y} aabb:{cell_aabb.GetCenter().x},{cell_aabb.GetCenter().y} obstacle:{obstacle_obb.Center.x},{obstacle_obb.Center.y}");
+                            // Debug.Log($"OBB 碰撞: index: {x},{y} aabb:{cell_aabb.GetCenter().x},{cell_aabb.GetCenter().y} obstacle:{obstacle_obb.Center.x},{obstacle_obb.Center.y}");
                             model.tm.SetWalkableValueWithIndex(index, false);
                         } else {
-                            Debug.Log($"OBB 未碰撞: index: {x},{y} aabb.Min:{cell_aabb.Min.x},{cell_aabb.Min.y}, aabb.Max:{cell_aabb.Max.x},{cell_aabb.Max.y} obstacle:{obstacle_obb.Center.x},{obstacle_obb.Center.y},angle:{obstacle_obb.RadAngle}");
+                            // Debug.Log($"OBB 未碰撞: index: {x},{y} aabb.Min:{cell_aabb.Min.x},{cell_aabb.Min.y}, aabb.Max:{cell_aabb.Max.x},{cell_aabb.Max.y} obstacle:{obstacle_obb.Center.x},{obstacle_obb.Center.y},angle:{obstacle_obb.RadAngle}");
                         }
                     }
                 }
@@ -184,6 +185,9 @@ namespace MortiseFrame.Compass.Sample {
 
             model.tm.countX = cellCount.x;
             model.tm.countY = cellCount.y;
+            model.tm.cellSize = cellSize;
+            model.tm.stageOffset = stageOffset;
+            model.tm.MPU = MPU;
 
             var grid = new bool[cellCount.x * cellCount.y];
             Debug.Log($"网格大小: {cellCount.x},{cellCount.y}");
@@ -252,6 +256,7 @@ namespace MortiseFrame.Compass.Sample {
 
             var center = collider.transform.position;
             var radius = collider.radius;
+            radius *= collider.transform.localScale.x;
             var circle = new Circle(center, radius);
             return circle;
 
@@ -261,6 +266,8 @@ namespace MortiseFrame.Compass.Sample {
 
             var offset = collider.offset;
             var size = collider.size;
+            size.x *= collider.transform.localScale.x;
+            size.y *= collider.transform.localScale.y;
             var center = collider.transform.position;
             var angle = collider.transform.eulerAngles.z * Mathf.Deg2Rad;
             var obb = new OBB(center, size, angle);
@@ -273,6 +280,8 @@ namespace MortiseFrame.Compass.Sample {
             // var offset = transform.position;
             var offset = collider.offset;
             var size = collider.size;
+            size.x *= collider.transform.localScale.x;
+            size.y *= collider.transform.localScale.y;
             var xMin = collider.transform.position.x - size.x / 2 + offset.x;
             var xMax = collider.transform.position.x + size.x / 2 + offset.x;
             var yMin = collider.transform.position.y - size.y / 2 + offset.y;
@@ -288,10 +297,10 @@ namespace MortiseFrame.Compass.Sample {
 
         AABB Index2AABB(int x, int y) {
             var offset = cellSize / 2;
-            var xMin = x * cellSize.x;
-            var xMax = x * cellSize.x + offset.x * 2;
-            var yMin = y * cellSize.y;
-            var yMax = y * cellSize.y + offset.y * 2;
+            var xMin = x * cellSize.x + stageOffset.x;
+            var xMax = x * cellSize.x + offset.x * 2 + stageOffset.x;
+            var yMin = y * cellSize.y + stageOffset.y;
+            var yMax = y * cellSize.y + offset.y * 2 + stageOffset.y;
             var min = new Vector2(xMin, yMin);
             var max = new Vector2(xMax, yMax);
             var cell_aabb = new AABB(min, max);
@@ -350,7 +359,7 @@ namespace MortiseFrame.Compass.Sample {
         Vector2 Index2GizmosCenter(Vector2Int index) {
 
             var cell_offset = cellSize / 2;
-            var pos = new Vector2(index.x * cellSize.x, index.y * cellSize.y) + cell_offset;
+            var pos = new Vector2(index.x * cellSize.x, index.y * cellSize.y) + cell_offset + stageOffset;
             return pos;
 
         }
