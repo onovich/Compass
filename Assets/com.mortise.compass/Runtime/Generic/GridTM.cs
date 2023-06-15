@@ -31,7 +31,7 @@ namespace MortiseFrame.Compass {
             var y = index.y;
             var i = x + y * countX;
             if (value == false) {
-                Debug.Log($"SetWalkableValueWithIndex: x = {x}; y = {y}; i = {i}; value = {value}; walkableValue[i] = {walkableValue[i]}");
+                // Debug.Log($"SetWalkableValueWithIndex: x = {x}; y = {y}; i = {i}; value = {value}; walkableValue[i] = {walkableValue[i]}");
             }
             if (i >= walkableValue.Length) {
                 Debug.LogError($"Index out of range: x = {x}; y = {y}; i = {i}");

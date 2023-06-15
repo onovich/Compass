@@ -102,7 +102,7 @@ namespace MortiseFrame.Compass.Sample {
                             model.tm.SetWalkableValueWithIndex(index, false);
                             EditorUtility.SetDirty(model);
 
-                            Debug.Log($"AABB 碰撞: {x},{y}");
+                            Debug.Log($"AABB 碰撞: index: {x},{y} aabb:{cell_aabb.GetCenter().x},{cell_aabb.GetCenter().y} obstacle:{obstacle_aabb.GetCenter().x},{obstacle_aabb.GetCenter().y}s");
                         }
 
                     }
@@ -130,7 +130,10 @@ namespace MortiseFrame.Compass.Sample {
 
                         if (intersect) {
                             var index = new Vector2Int(x, y);
+                            Debug.Log($"OBB 碰撞: index: {x},{y} aabb:{cell_aabb.GetCenter().x},{cell_aabb.GetCenter().y} obstacle:{obstacle_obb.Center.x},{obstacle_obb.Center.y}");
                             model.tm.SetWalkableValueWithIndex(index, false);
+                        } else {
+                            Debug.Log($"OBB 未碰撞: index: {x},{y} aabb.Min:{cell_aabb.Min.x},{cell_aabb.Min.y}, aabb.Max:{cell_aabb.Max.x},{cell_aabb.Max.y} obstacle:{obstacle_obb.Center.x},{obstacle_obb.Center.y},angle:{obstacle_obb.RadAngle}");
                         }
                     }
                 }
@@ -259,15 +262,16 @@ namespace MortiseFrame.Compass.Sample {
             var offset = collider.offset;
             var size = collider.size;
             var center = collider.transform.position;
-            var angle = collider.transform.eulerAngles.z;
+            var angle = collider.transform.eulerAngles.z * Mathf.Deg2Rad;
             var obb = new OBB(center, size, angle);
             return obb;
 
         }
 
         AABB BoxCollider2AABB(BoxCollider2D collider) {
-            // var offset = collider.offset;
-            var offset = Vector2.zero;
+
+            // var offset = transform.position;
+            var offset = collider.offset;
             var size = collider.size;
             var xMin = collider.transform.position.x - size.x / 2 + offset.x;
             var xMax = collider.transform.position.x + size.x / 2 + offset.x;
@@ -279,14 +283,15 @@ namespace MortiseFrame.Compass.Sample {
 
             // Debug.Log($"aabb: {collider.transform.position.x},{collider.transform.position.y},{size.x},{size.y},xmin:{xMin},xmax:{xMax},ymin:{yMin},ymax:{yMax}");
             return aabb;
+
         }
 
         AABB Index2AABB(int x, int y) {
             var offset = cellSize / 2;
-            var xMin = x * cellSize.x - offset.x;
-            var xMax = x * cellSize.x + offset.x;
-            var yMin = y * cellSize.y - offset.y;
-            var yMax = y * cellSize.y + offset.y;
+            var xMin = x * cellSize.x;
+            var xMax = x * cellSize.x + offset.x * 2;
+            var yMin = y * cellSize.y;
+            var yMax = y * cellSize.y + offset.y * 2;
             var min = new Vector2(xMin, yMin);
             var max = new Vector2(xMax, yMax);
             var cell_aabb = new AABB(min, max);
