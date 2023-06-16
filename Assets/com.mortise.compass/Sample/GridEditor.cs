@@ -1,6 +1,3 @@
-using ClipperLib;
-using System;
-using System.Linq;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
