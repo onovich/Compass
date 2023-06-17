@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.mortise.knot": "ssh://git@github.com/onovich/Knot.git?path=/Assets/com.mortise.knot#main",
-    "com.mortise.modifier.toaster": "ssh://git@gitlab.4399doc.com/hjn/toaster.git?path=/Assets/com.mortise.modifier.toaster#main",
+    "com.mortise.modifier.toaster": "ssh://git@github.com/onovich/Toaster.git?path=/Assets/com.mortise.modifier.toaster#main",
     "com.unity.collab-proxy": "1.15.15",
     "com.unity.feature.development": "1.0.1",
     "com.unity.ide.rider": "3.0.13",

@@ -8,7 +8,7 @@
       "hash": "9ceabe5ba7e7f31b45571f02e80bacf54927f8ed"
     },
     "com.mortise.modifier.toaster": {
-      "version": "ssh://git@gitlab.4399doc.com/hjn/toaster.git?path=/Assets/com.mortise.modifier.toaster#main",
+      "version": "ssh://git@github.com/onovich/Toaster.git?path=/Assets/com.mortise.modifier.toaster#main",
       "depth": 0,
       "source": "git",
       "dependencies": {},
