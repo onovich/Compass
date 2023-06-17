@@ -18,7 +18,7 @@ namespace MortiseFrame.Compass {
             this.heuristicFunc = HeuristicUtil.GetHeuristic(type);
         }
 
-        public List<Node2D> FindPath(Map2D map, Node2D start, Node2D end) {
+        public List<Node2D> FindPath(Map2D map, Node2D start, Node2D end, float agentSize) {
 
             openList.Clear();
             closedList.Clear();
@@ -43,6 +43,12 @@ namespace MortiseFrame.Compass {
                     if (nx < 0 || nx >= map.Width || ny < 0 || ny >= map.Height) {
                         continue;
                     }
+
+                    // 通行度测试
+                    if (map.Nodes[nx, ny].Capacity < agentSize) {
+                        continue;
+                    }
+                    Debug.Log($"通行度测试通过: {map.Nodes[nx, ny].Capacity} >= {agentSize}");
 
                     var neighbour = map.Nodes[nx, ny];
 

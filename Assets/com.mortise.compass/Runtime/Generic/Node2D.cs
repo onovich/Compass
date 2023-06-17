@@ -35,6 +35,10 @@ namespace MortiseFrame.Compass {
         public bool Walkable => walkable;
         public void SetWalkable(bool value) => walkable = value;
 
+        int capacity;
+        public int Capacity => capacity;
+        public void SetCapacity(int value) => capacity = value;
+
         public int CompareTo(Node2D other) {
             if (other.F > F) {
                 return -1;
@@ -56,6 +60,8 @@ namespace MortiseFrame.Compass {
             h = 0;
             x = 0;
             y = 0;
+            capacity = 0;
+            walkable = false;
             parent = null;
         }
 
