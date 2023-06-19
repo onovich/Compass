@@ -10,23 +10,42 @@ namespace MortiseFrame.Compass {
         readonly List<Node2D> closedList = new List<Node2D>();
         readonly int[] dx = { -1, 1, 0, 0, -1, -1, 1, 1 };
         readonly int[] dy = { 0, 0, -1, 1, -1, 1, -1, 1 };
+        readonly int mpu;
+        readonly Vector2 localOffset;
+        public event Action OnReachHandel;
 
         // 启发式函数
         readonly Func<Node2D, Node2D, float> heuristicFunc;
 
-        public Compass2D(HeuristicType type = HeuristicType.Euclidean) {
+        public Compass2D(int mpu, Vector2 localOffset, HeuristicType type = HeuristicType.Euclidean) {
+            this.mpu = mpu;
+            this.localOffset = localOffset;
             this.heuristicFunc = HeuristicUtil.GetHeuristic(type);
         }
 
-        public List<Node2D> FindPath(Map2D map, Node2D start, Node2D end, float agentSize) {
+        public List<Node2D> FindPath(Map2D map, Vector2 startPos, Vector2 endPos, float agentsize) {
 
             openList.Clear();
             closedList.Clear();
+
+            var start = MathUtil.Pos2Node(startPos, mpu, localOffset, map);
+            var end = MathUtil.Pos2Node(endPos, mpu, localOffset, map);
+            var agentRealSize = agentsize * mpu;
+
+            if (start == null) {
+                Debug.LogError($"start is null: {startPos}");
+                return null;
+            }
+
             openList.Add(start);
 
             while (openList.Count > 0) {
                 openList.Sort();
                 var currentNode = openList[0];
+                if (currentNode == null) {
+                    Debug.LogError("currentNode is null");
+                    return null;
+                }
 
                 if (currentNode.X == end.X && currentNode.Y == end.Y) {
                     var path = GetPathFromNode(currentNode, start);
@@ -45,10 +64,9 @@ namespace MortiseFrame.Compass {
                     }
 
                     // 通行度测试
-                    if (map.Nodes[nx, ny].Capacity < agentSize) {
+                    if (map.Nodes[nx, ny].Capacity < agentRealSize) {
                         continue;
                     }
-                    Debug.Log($"通行度测试通过: {map.Nodes[nx, ny].Capacity} >= {agentSize}");
 
                     var neighbour = map.Nodes[nx, ny];
 

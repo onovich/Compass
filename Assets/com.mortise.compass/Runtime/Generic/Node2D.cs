@@ -54,6 +54,24 @@ namespace MortiseFrame.Compass {
             this.walkable = walkable;
         }
 
+        public Vector2 GetPos(int mpu, Vector2 localOffset) {
+
+            var posX = x / mpu + localOffset.x;
+            var posY = y / mpu + localOffset.y;
+
+            return new Vector2(posX, posY);
+
+        }
+
+        public Vector3 GetPos3D(Node2D node, int mpu, Vector2 localOffset) {
+
+            var x = node.X / mpu + localOffset.x;
+            var y = node.Y / mpu + localOffset.y;
+            var z = 0;
+            return new Vector3(x, y, z);
+
+        }
+
         public void Clear() {
             f = 0;
             g = 0;
