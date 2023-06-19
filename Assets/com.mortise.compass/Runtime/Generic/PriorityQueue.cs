@@ -1,12 +1,14 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MortiseFrame.Compass {
 
-    public class PriorityQueue<T> {
-        private List<Tuple<T, float>> elements = new List<Tuple<T, float>>();
-        private Dictionary<T, int> elementIndices = new Dictionary<T, int>();
+    public class PriorityQueue<T> : IEnumerable<T> {
+        List<Tuple<T, float>> elements = new List<Tuple<T, float>>();
+        public List<Tuple<T, float>> Elements => elements;
+        Dictionary<T, int> elementIndices = new Dictionary<T, int>();
 
         public int Count {
             get { return elements.Count; }
@@ -85,6 +87,17 @@ namespace MortiseFrame.Compass {
             elements.Clear();
             elementIndices.Clear();
         }
+
+        public IEnumerator<T> GetEnumerator() {
+            foreach (var element in elements) {
+                yield return element.Item1;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return GetEnumerator();
+        }
+
     }
 
 }

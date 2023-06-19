@@ -22,13 +22,14 @@ namespace MortiseFrame.Compass.Sample {
         public float agentSize = 1f;
 
         LineRenderer lineRenderer;
+        Node2DPool node2DPool;
 
         void Awake() {
 
             lineRenderer = GetComponent<LineRenderer>();
 
-            this.map = new Map2D(model.tm.CellCount.x, model.tm.CellCount.y, model.tm.GetPassableValue, model.tm.GetCapacityValue);
-            this.compass = new Compass2D(model.tm.MPU, model.tm.LocalOffset, HeuristicType.Euclidean);
+            this.map = new Map2D(model.tm.CellCount.x, model.tm.CellCount.y, 1000, out node2DPool, model.tm.GetPassableValue, model.tm.GetCapacityValue);
+            this.compass = new Compass2D(model.tm.MPU, node2DPool, model.tm.LocalOffset, HeuristicType.Euclidean);
 
             isStop = false;
 
@@ -40,8 +41,12 @@ namespace MortiseFrame.Compass.Sample {
                 return;
             }
 
-            path = compass.FindPath(map, startPos, endPos, agentSize);
+            if (compass == null) {
+                Debug.LogError("Compass is null");
+                return;
+            }
 
+            path = compass.FindPath(map, startPos, endPos, agentSize);
 
         }
 

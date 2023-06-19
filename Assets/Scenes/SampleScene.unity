@@ -239,7 +239,7 @@ MonoBehaviour:
   model: {fileID: 11400000, guid: 4b97ffd210733ae4989e4c5babe2f88c, type: 2}
   end: {fileID: 2047772315}
   agent: {fileID: 829996827}
-  agentSize: 1.5
+  agentSize: 2
 --- !u!4 &422664574
 Transform:
   m_ObjectHideFlags: 0
