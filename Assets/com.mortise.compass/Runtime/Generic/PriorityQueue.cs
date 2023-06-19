@@ -5,14 +5,14 @@ using System.Linq;
 namespace MortiseFrame.Compass {
 
     public class PriorityQueue<T> {
-        private List<Tuple<T, int>> elements = new List<Tuple<T, int>>();
+        private List<Tuple<T, float>> elements = new List<Tuple<T, float>>();
         private Dictionary<T, int> elementIndices = new Dictionary<T, int>();
 
         public int Count {
             get { return elements.Count; }
         }
 
-        public void Enqueue(T item, int priority) {
+        public void Enqueue(T item, float priority) {
             elements.Add(Tuple.Create(item, priority));
             elementIndices[item] = elements.Count - 1;
             BubbleUp(elements.Count - 1);
@@ -31,9 +31,9 @@ namespace MortiseFrame.Compass {
             return elementIndices.ContainsKey(item);
         }
 
-        public void UpdatePriority(T item, int newPriority) {
+        public void UpdatePriority(T item, float newPriority) {
             int index = elementIndices[item];
-            int oldPriority = elements[index].Item2;
+            float oldPriority = elements[index].Item2;
             elements[index] = Tuple.Create(item, newPriority);
             if (newPriority < oldPriority) {
                 BubbleUp(index);

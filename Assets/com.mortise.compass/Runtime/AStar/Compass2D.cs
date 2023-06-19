@@ -6,14 +6,12 @@ using UnityEngine;
 namespace MortiseFrame.Compass {
     public class Compass2D {
 
-        readonly List<Node2D> openList = new List<Node2D>();
+        readonly PriorityQueue<Node2D> openList = new PriorityQueue<Node2D>();
         readonly List<Node2D> closedList = new List<Node2D>();
         readonly int[] dx = { -1, 1, 0, 0, -1, -1, 1, 1 };
         readonly int[] dy = { 0, 0, -1, 1, -1, 1, -1, 1 };
         readonly int mpu;
         readonly Vector2 localOffset;
-
-        LineRenderer lineRenderer;
 
         // 启发式函数
         readonly Func<Node2D, Node2D, float> heuristicFunc;
@@ -32,18 +30,16 @@ namespace MortiseFrame.Compass {
             var start = MathUtil.Pos2Node(startPos, mpu, localOffset, map);
             var end = MathUtil.Pos2Node(endPos, mpu, localOffset, map);
             var agentRealSize = agentsize * mpu;
-            Debug.Log($"agentRealSize: {agentRealSize},mpu: {mpu}");
 
             if (start == null) {
                 Debug.LogError($"start is null: {startPos}");
                 return null;
             }
 
-            openList.Add(start);
+            openList.Enqueue(start, start.F);
 
             while (openList.Count > 0) {
-                openList.Sort();
-                var currentNode = openList[0];
+                var currentNode = openList.Dequeue();
                 if (currentNode == null) {
                     Debug.LogError("currentNode is null");
                     return null;
@@ -54,7 +50,6 @@ namespace MortiseFrame.Compass {
                     return path;
                 }
 
-                openList.Remove(currentNode);
                 closedList.Add(currentNode);
 
                 for (int i = 0; i < 8; i++) {
@@ -68,7 +63,7 @@ namespace MortiseFrame.Compass {
                     // 通行度测试
                     if (map.Nodes[nx, ny].Capacity < agentRealSize) {
                         continue;
-                    } 
+                    }
 
                     var neighbour = map.Nodes[nx, ny];
 
@@ -77,7 +72,7 @@ namespace MortiseFrame.Compass {
                     }
 
                     if (!openList.Contains(neighbour)) {
-                        openList.Add(neighbour);
+                        openList.Enqueue(neighbour, neighbour.F);
                         neighbour.SetG(currentNode.G + 1);
                         neighbour.SetH(heuristicFunc(neighbour, end));
                         neighbour.SetF(neighbour.G + neighbour.H);
@@ -88,7 +83,7 @@ namespace MortiseFrame.Compass {
                         neighbour.SetG(currentNode.G + 1);
                         neighbour.SetF(neighbour.G + neighbour.H);
                         neighbour.SetParent(currentNode);
-                        openList.Sort();
+                        openList.UpdatePriority(neighbour, neighbour.F);
                     }
                 }
             }
@@ -96,18 +91,21 @@ namespace MortiseFrame.Compass {
             return null;
         }
 
-
         private List<Node2D> GetPathFromNode(Node2D node, Node2D startNode) {
-            var path = new List<Node2D>();
-            while (node != null) {
-                if (node != startNode) {
-                    path.Add(node);
-                }
-                node = node.Parent;
-            }
-            path.Reverse();
-            return path;
-        }
 
+            var path = new List<Node2D> { node };
+
+            while (node.Parent != startNode) {
+                node = node.Parent;
+                path.Add(node);
+            }
+
+            path.Add(startNode);
+            path.Reverse();
+
+            return path;
+
+        }
+        
     }
 }
