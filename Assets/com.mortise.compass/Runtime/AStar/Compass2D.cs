@@ -12,7 +12,8 @@ namespace MortiseFrame.Compass {
         readonly int[] dy = { 0, 0, -1, 1, -1, 1, -1, 1 };
         readonly int mpu;
         readonly Vector2 localOffset;
-        public event Action OnReachHandel;
+
+        LineRenderer lineRenderer;
 
         // 启发式函数
         readonly Func<Node2D, Node2D, float> heuristicFunc;
@@ -31,6 +32,7 @@ namespace MortiseFrame.Compass {
             var start = MathUtil.Pos2Node(startPos, mpu, localOffset, map);
             var end = MathUtil.Pos2Node(endPos, mpu, localOffset, map);
             var agentRealSize = agentsize * mpu;
+            Debug.Log($"agentRealSize: {agentRealSize},mpu: {mpu}");
 
             if (start == null) {
                 Debug.LogError($"start is null: {startPos}");
@@ -66,7 +68,7 @@ namespace MortiseFrame.Compass {
                     // 通行度测试
                     if (map.Nodes[nx, ny].Capacity < agentRealSize) {
                         continue;
-                    }
+                    } 
 
                     var neighbour = map.Nodes[nx, ny];
 

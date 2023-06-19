@@ -21,10 +21,15 @@ namespace MortiseFrame.Compass.Sample {
         List<Node2D> path;
         public float agentSize = 1f;
 
+        LineRenderer lineRenderer;
+
         void Awake() {
+
+            lineRenderer = GetComponent<LineRenderer>();
 
             this.map = new Map2D(model.tm.CellCount.x, model.tm.CellCount.y, model.tm.GetPassableValue, model.tm.GetCapacityValue);
             this.compass = new Compass2D(model.tm.MPU, model.tm.LocalOffset, HeuristicType.Euclidean);
+
             isStop = false;
 
             var startPos = agent.position;
@@ -36,6 +41,7 @@ namespace MortiseFrame.Compass.Sample {
             }
 
             path = compass.FindPath(map, startPos, endPos, agentSize);
+
 
         }
 
