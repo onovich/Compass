@@ -60,14 +60,9 @@ namespace MortiseFrame.Compass {
                         continue;
                     }
 
-                    // 通行度测试
-                    if (map.Nodes[nx, ny].Capacity < agentRealSize) {
-                        continue;
-                    }
-
                     var neighbour = map.Nodes[nx, ny];
 
-                    if (closedList.Contains(neighbour) || !neighbour.Walkable) {
+                    if (closedList.Contains(neighbour) || neighbour.Capacity < agentRealSize) {
                         continue;
                     }
 
@@ -106,6 +101,6 @@ namespace MortiseFrame.Compass {
             return path;
 
         }
-        
+
     }
 }
