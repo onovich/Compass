@@ -21,12 +21,9 @@ namespace MortiseFrame.Compass.Sample {
         List<Node2D> path;
         public float agentSize = 1f;
 
-        LineRenderer lineRenderer;
         Node2DPool node2DPool;
 
         void Awake() {
-
-            lineRenderer = GetComponent<LineRenderer>();
 
             this.map = new Map2D(model.tm.CellCount.x, model.tm.CellCount.y, 1000, out node2DPool, model.tm.GetPassableValue, model.tm.GetCapacityValue);
             this.compass = new Compass2D(model.tm.MPU, node2DPool, model.tm.LocalOffset, HeuristicType.Euclidean);
