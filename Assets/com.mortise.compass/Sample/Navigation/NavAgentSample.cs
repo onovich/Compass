@@ -29,6 +29,13 @@ namespace MortiseFrame.Compass.Sample {
         public List<Node2D> Path => path;
         public void SetPath(List<Node2D> value) => path = value;
 
+        int currentPathIndex = 0;
+        public int CurrentPathIndex => currentPathIndex;
+        public void SetCurrentPathIndex(int value) => currentPathIndex = value;
+        public void AddCurrentPathIndex() => currentPathIndex += 1;
+
+        public bool isStop = false;
+
     }
 
 }

@@ -10,69 +10,70 @@ namespace MortiseFrame.Compass.Sample {
         // Input
         [Header("输入")] public CompassSampleSO model;
 
-        Compass2D compass;
-        public Transform end;
-        public Transform agent;
+        public NavAgentSample agent_01;
+        public NavAgentSample agent_02;
 
-        Map2D map;
         float speed = 10f;
-        bool isStop = false;
 
-        List<Node2D> path;
         public float agentSize = 1f;
-
-        Node2DPool node2DPool;
 
         void Awake() {
 
-            this.map = new Map2D(model.tm.CellCount.x, model.tm.CellCount.y, 1000, out node2DPool, model.tm.GetPassableValue, model.tm.GetCapacityValue);
-            this.compass = new Compass2D(model.tm.MPU, node2DPool, model.tm.LocalOffset, HeuristicType.Euclidean);
-
-            isStop = false;
-
-            var startPos = agent.position;
-            var endPos = end.position;
-
-            if (map == null) {
-                Debug.LogError("Map is null");
-                return;
-            }
-
-            if (compass == null) {
-                Debug.LogError("Compass is null");
-                return;
-            }
-
-            path = compass.FindPath(map, startPos, endPos, agentSize);
+            InitAgent(agent_01);
+            InitAgent(agent_02);
 
         }
 
-        void OnReach() {
-            isStop = true;
+        void InitAgent(NavAgentSample agent) {
+            var map = new Map2D(model.tm.CellCount.x, model.tm.CellCount.y, 1000, out var node2DPool, model.tm.GetPassableValue, model.tm.GetCapacityValue);
+            var compass = new Compass2D(model.tm.MPU, node2DPool, model.tm.LocalOffset, HeuristicType.Euclidean);
+            agent.SetCompass(compass);
+            agent.SetMap(map);
+        }
+
+        void OnReach(NavAgentSample agent) {
+            agent.isStop = true;
+        }
+
+        void TickAgent(NavAgentSample agent, Transform end) {
+            if (agent.isStop) {
+                return;
+            }
+
+            var startPos = agent.transform.position;
+            var endPos = end.position;
+
+            var path = agent.Compass.FindPath(agent.Map, startPos, endPos, agentSize);
+            agent.SetPath(path);
+
+            if (path == null || path.Count == 0 || agent.CurrentPathIndex >= agent.Path.Count) {
+                agent.isStop = true;
+                OnReach(agent);
+                return;
+            }
+
+            if (path == null || path.Count == 0 || agent.CurrentPathIndex >= agent.Path.Count) {
+                agent.isStop = true;
+                OnReach(agent);
+                return;
+            }
+
+            var currentPos = agent.transform.position;
+            var nextPos = agent.Path[agent.CurrentPathIndex].GetPos(model.tm.MPU, model.tm.LocalOffset);
+            float step = speed * Time.deltaTime;
+
+            var dir = new Vector2(nextPos.x - currentPos.x, nextPos.y - currentPos.y).normalized;
+            agent.transform.position = AddVector2ToPos(dir * step, currentPos);
+
+            if (Vector2.Distance(currentPos, nextPos) <= 0.05f) {
+                agent.AddCurrentPathIndex();
+            }
         }
 
         void Update() {
 
-            if (isStop) {
-                return;
-            }
-
-            if (path == null || path.Count == 0) {
-                isStop = true;
-                OnReach();
-                return;
-            }
-
-            var currentPos = agent.position;
-            var nextPos = path[0].GetPos(model.tm.MPU, model.tm.LocalOffset);
-            float step = speed * Time.deltaTime;
-
-            var dir = new Vector2(nextPos.x - currentPos.x, nextPos.y - currentPos.y).normalized;
-            agent.position = AddVector2ToPos(dir * step, currentPos);
-
-            if (Vector2.Distance(currentPos, nextPos) <= 0.05f) {
-                path.RemoveAt(0);
-            }
+            TickAgent(agent_01, agent_02.transform);
+            TickAgent(agent_02, agent_01.transform);
 
         }
 
