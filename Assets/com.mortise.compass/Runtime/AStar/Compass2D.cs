@@ -10,6 +10,7 @@ namespace MortiseFrame.Compass {
         readonly HashSet<Node2D> closedList = new HashSet<Node2D>();
         readonly int[] dx = { -1, 1, 0, 0, -1, -1, 1, 1 };
         readonly int[] dy = { 0, 0, -1, 1, -1, 1, -1, 1 };
+        readonly int[] cost = { 10, 10, 10, 10, 14, 14, 14, 14 };
         readonly int mpu;
         readonly Vector2 localOffset;
         readonly Node2DPool nodePool;
@@ -86,7 +87,7 @@ namespace MortiseFrame.Compass {
                         continue;
                     }
 
-                    float tentativeG = currentNode.G + 1;
+                    float tentativeG = currentNode.G + cost[i];
 
                     if (!openList.Contains(neighbour)) {
                         openList.Enqueue(neighbour, neighbour.F);
@@ -102,7 +103,9 @@ namespace MortiseFrame.Compass {
                     if (openList.Contains(neighbour)) {
                         openList.UpdatePriority(neighbour, neighbour.F);
                     }
+
                 }
+
             }
             OnReach?.Invoke(false); // 告知上层无法抵达终点
             return GetPathFromNode(closestNodeToTarget);
