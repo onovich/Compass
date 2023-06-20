@@ -14,6 +14,9 @@ namespace MortiseFrame.Compass {
         readonly Vector2 localOffset;
         readonly Node2DPool nodePool;
 
+        // 回调
+        public Action<bool> OnReach;
+
         // 启发式函数
         readonly Func<Node2D, Node2D, float> heuristicFunc;
 
@@ -37,6 +40,10 @@ namespace MortiseFrame.Compass {
                 return null;
             }
 
+            // 如果起点或终点不可通过，寻找最近的可通过点
+            Node2D closestNodeToTarget = start;
+            float closestDistanceToTarget = Vector2.Distance(startPos, endPos);
+
             start.SetG(0);
             start.SetH(heuristicFunc(start, end));
             start.SetF(start.G + start.H);
@@ -52,6 +59,7 @@ namespace MortiseFrame.Compass {
                 }
 
                 if (currentNode == end) {
+                    OnReach?.Invoke(true); // 告知上层抵达终点
                     return GetPathFromNode(currentNode);
                 }
 
@@ -66,6 +74,13 @@ namespace MortiseFrame.Compass {
                     }
 
                     var neighbour = map.Nodes[nx, ny];
+
+                    // 更新最近的可通过点
+                    var distanceToTarget = Vector2.Distance(new Vector2(neighbour.X, neighbour.Y), endPos);
+                    if (distanceToTarget < closestDistanceToTarget) {
+                        closestDistanceToTarget = distanceToTarget;
+                        closestNodeToTarget = neighbour;
+                    }
 
                     if (closedList.Contains(neighbour) || neighbour.Capacity < agentRealSize) {
                         continue;
@@ -89,8 +104,8 @@ namespace MortiseFrame.Compass {
                     }
                 }
             }
-
-            return null;
+            OnReach?.Invoke(false); // 告知上层无法抵达终点
+            return GetPathFromNode(closestNodeToTarget);
         }
 
         private List<Node2D> GetPathFromNode(Node2D endNode) {
