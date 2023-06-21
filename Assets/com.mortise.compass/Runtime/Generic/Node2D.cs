@@ -63,12 +63,12 @@ namespace MortiseFrame.Compass {
 
         }
 
-        public Vector3 GetPos3D(Node2D node, int mpu, Vector2 localOffset) {
+        public Vector3 GetPos3D(int mpu, Vector2 localOffset) {
 
-            var x = node.X / mpu + localOffset.x;
-            var y = node.Y / mpu + localOffset.y;
-            var z = 0;
-            return new Vector3(x, y, z);
+            var posX = x / mpu + localOffset.x;
+            var posY = y / mpu + localOffset.y;
+            var posZ = 0;
+            return new Vector3(posX, posY, posZ);
 
         }
 

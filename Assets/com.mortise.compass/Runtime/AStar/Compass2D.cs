@@ -47,7 +47,8 @@ namespace MortiseFrame.Compass {
 
             start.SetG(0);
             start.SetH(heuristicFunc(start, end));
-            start.SetF(start.G + start.H);
+            // start.SetF(start.G + start.H);
+            start.SetF(0);
             start.SetParent(null);
 
             openList.Enqueue(start, start.F);
@@ -89,19 +90,17 @@ namespace MortiseFrame.Compass {
 
                     float tentativeG = currentNode.G + cost[i];
 
-                    if (!openList.Contains(neighbour)) {
-                        openList.Enqueue(neighbour, neighbour.F);
-                    } else if (tentativeG >= neighbour.G) {
-                        continue;
-                    }
+                    if (tentativeG < neighbour.G || !openList.Contains(neighbour)) {
+                        neighbour.SetG(tentativeG);
+                        neighbour.SetH(heuristicFunc(neighbour, end));
+                        neighbour.SetF(neighbour.G + neighbour.H);
+                        neighbour.SetParent(currentNode);
 
-                    neighbour.SetG(tentativeG);
-                    neighbour.SetH(heuristicFunc(neighbour, end));
-                    neighbour.SetF(neighbour.G + neighbour.H);
-                    neighbour.SetParent(currentNode);
-
-                    if (openList.Contains(neighbour)) {
-                        openList.UpdatePriority(neighbour, neighbour.F);
+                        if (openList.Contains(neighbour)) {
+                            openList.UpdatePriority(neighbour, neighbour.F);
+                        } else {
+                            openList.Enqueue(neighbour, neighbour.F);
+                        }
                     }
 
                 }
