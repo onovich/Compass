@@ -44,6 +44,7 @@ namespace MortiseFrame.Compass.Sample {
             }
 
             var endPos = agent.Target.position;
+            agent.ResetPathIndex();
 
             if (agent.Path == null || agent.Path.Count == 0 || agent.CurrentPathIndex >= agent.Path.Count
                 || (agent.LastTargetPos != null && Vector2.Distance(agent.LastTargetPos.Value, endPos) > 0.01f)) {
@@ -65,13 +66,14 @@ namespace MortiseFrame.Compass.Sample {
             float step = speed * Time.deltaTime;
             // float step = speed * Time.fixedDeltaTime / 4;
 
-            var dir = new Vector2(nextPos.x - currentPos.x, nextPos.y - currentPos.y).normalized;
-            agent.transform.position = AddVector2ToPos(dir * step, currentPos);
-
-            currentPos = agent.transform.position;
-            if (Vector2.Distance(currentPos, nextPos) <= 0.05f) {
+            var currentIndex = MathUtil.Pos2Index(currentPos, model.tm.MPU, model.tm.LocalOffset);
+            var nextIndex = MathUtil.Pos2Index(nextPos, model.tm.MPU, model.tm.LocalOffset);
+            if (Vector2.Distance(currentIndex, nextIndex) <= 1f) {
                 agent.AddCurrentPathIndex();
             }
+
+            var dir = new Vector2(nextPos.x - currentPos.x, nextPos.y - currentPos.y).normalized;
+            agent.transform.position = AddVector2ToPos(dir * step, currentPos);
 
         }
 

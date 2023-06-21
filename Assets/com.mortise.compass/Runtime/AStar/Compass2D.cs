@@ -63,7 +63,7 @@ namespace MortiseFrame.Compass {
 
                 if (currentNode == end) {
                     OnReach?.Invoke(true); // 告知上层抵达终点
-                    return GetPathFromNode(currentNode);
+                    return GetPathFromNode(currentNode, start);
                 }
 
                 closedList.Add(currentNode);
@@ -94,7 +94,7 @@ namespace MortiseFrame.Compass {
                         closestNodeToTarget = neighbour;
                     }
 
-                    if (closedList.Contains(neighbour) || neighbour.Capacity < agentRealSize) {
+                    if (closedList.Contains(neighbour) || neighbour.Capacity < agentRealSize || !neighbour.Walkable) {
                         continue;
                     }
 
@@ -117,10 +117,10 @@ namespace MortiseFrame.Compass {
 
             }
             OnReach?.Invoke(false); // 告知上层无法抵达终点
-            return GetPathFromNode(closestNodeToTarget);
+            return GetPathFromNode(closestNodeToTarget, start);
         }
 
-        private List<Node2D> GetPathFromNode(Node2D endNode) {
+        private List<Node2D> GetPathFromNode(Node2D endNode, Node2D startNode) {
             var path = new List<Node2D>();
             var currentNode = endNode;
 
@@ -128,7 +128,7 @@ namespace MortiseFrame.Compass {
                 path.Add(currentNode);
                 currentNode = currentNode.Parent;
             }
-
+            path.Remove(startNode);
             path.Reverse();
             return path;
         }

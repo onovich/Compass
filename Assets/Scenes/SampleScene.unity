@@ -241,7 +241,7 @@ MonoBehaviour:
   agent_02: {fileID: 1602386547}
   agent_03: {fileID: 1983672293}
   speed: 1
-  agentSize: 0.5
+  agentSize: 2
 --- !u!4 &422664574
 Transform:
   m_ObjectHideFlags: 0
