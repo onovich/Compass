@@ -14,7 +14,7 @@ namespace MortiseFrame.Compass.Sample {
         public NavAgentSample agent_02;
         public NavAgentSample agent_03;
 
-        float speed = 10f;
+        public float speed = 10f;
 
         public float agentSize = 1f;
 
@@ -48,8 +48,8 @@ namespace MortiseFrame.Compass.Sample {
             if (agent.Path == null || agent.Path.Count == 0 || agent.CurrentPathIndex >= agent.Path.Count
                 || (agent.LastTargetPos != null && Vector2.Distance(agent.LastTargetPos.Value, endPos) > 0.01f)) {
                 var startPos = agent.transform.position;
-
-                var path = agent.Compass.FindPath(agent.Map, startPos, endPos, agentSize);
+                var agentRealSize = agentSize * model.tm.MPU;
+                var path = agent.Compass.FindPath(agent.Map, startPos, endPos, agentRealSize);
                 agent.SetPath(path);
                 agent.SetLastTargetPos(endPos);
             }
@@ -62,8 +62,8 @@ namespace MortiseFrame.Compass.Sample {
 
             var currentPos = agent.transform.position;
             var nextPos = agent.Path[agent.CurrentPathIndex].GetPos(model.tm.MPU, model.tm.LocalOffset);
-            // float step = speed * Time.deltaTime;
-            float step = speed * Time.fixedDeltaTime / 4;
+            float step = speed * Time.deltaTime;
+            // float step = speed * Time.fixedDeltaTime / 4;
 
             var dir = new Vector2(nextPos.x - currentPos.x, nextPos.y - currentPos.y).normalized;
             agent.transform.position = AddVector2ToPos(dir * step, currentPos);

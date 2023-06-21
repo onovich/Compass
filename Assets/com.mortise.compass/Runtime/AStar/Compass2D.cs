@@ -33,7 +33,7 @@ namespace MortiseFrame.Compass {
             closedList.Clear();
 
             var end = MathUtil.Pos2Node(endPos, mpu, localOffset, map);
-            var start = MathUtil.Pos2Node(startPos, mpu, localOffset, map, end);
+            var start = MathUtil.Pos2Node(startPos, mpu, localOffset, map);
 
             var agentRealSize = agentsize * mpu;
 
@@ -77,6 +77,15 @@ namespace MortiseFrame.Compass {
                     }
 
                     var neighbour = map.Nodes[nx, ny];
+
+                    // 对于对角线移动，检查两个相邻的方格是否都是通行的
+                    if (i >= 4) { // i >= 4 表示现在是对角线移动
+                        var neighbour1 = map.Nodes[currentNode.X + dx[i], currentNode.Y];
+                        var neighbour2 = map.Nodes[currentNode.X, currentNode.Y + dy[i]];
+                        if (neighbour1.Capacity < agentRealSize || neighbour2.Capacity < agentRealSize) {
+                            continue;
+                        }
+                    }
 
                     // 更新最近的可通过点
                     var distanceToTarget = Vector2.Distance(new Vector2(neighbour.X, neighbour.Y), endPos);
