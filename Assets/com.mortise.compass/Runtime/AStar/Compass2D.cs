@@ -32,8 +32,9 @@ namespace MortiseFrame.Compass {
             openList.Clear();
             closedList.Clear();
 
-            var start = MathUtil.Pos2Node(startPos, mpu, localOffset, map);
             var end = MathUtil.Pos2Node(endPos, mpu, localOffset, map);
+            var start = MathUtil.Pos2Node(startPos, mpu, localOffset, map, end);
+
             var agentRealSize = agentsize * mpu;
 
             if (start == null || end == null) {

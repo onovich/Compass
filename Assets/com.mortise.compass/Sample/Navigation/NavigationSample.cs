@@ -62,8 +62,8 @@ namespace MortiseFrame.Compass.Sample {
 
             var currentPos = agent.transform.position;
             var nextPos = agent.Path[agent.CurrentPathIndex].GetPos(model.tm.MPU, model.tm.LocalOffset);
-            float step = speed * Time.deltaTime;
-            // float step = speed * Time.fixedDeltaTime / 4;
+            // float step = speed * Time.deltaTime;
+            float step = speed * Time.fixedDeltaTime / 4;
 
             var dir = new Vector2(nextPos.x - currentPos.x, nextPos.y - currentPos.y).normalized;
             agent.transform.position = AddVector2ToPos(dir * step, currentPos);
