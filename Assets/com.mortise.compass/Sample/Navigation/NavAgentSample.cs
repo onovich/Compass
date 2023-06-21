@@ -33,6 +33,12 @@ namespace MortiseFrame.Compass.Sample {
         public int CurrentPathIndex => currentPathIndex;
         public void SetCurrentPathIndex(int value) => currentPathIndex = value;
         public void AddCurrentPathIndex() => currentPathIndex += 1;
+        public void ResetPathIndex() => currentPathIndex = 0;
+
+        // Add a property to remember the last target position
+        Vector2? lastTargetPos = null;
+        public Vector2? LastTargetPos => lastTargetPos;
+        public void SetLastTargetPos(Vector2? value) => lastTargetPos = value;
 
         public bool isStop = false;
 

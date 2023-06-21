@@ -12,6 +12,7 @@ namespace MortiseFrame.Compass.Sample {
 
         public NavAgentSample agent_01;
         public NavAgentSample agent_02;
+        public NavAgentSample agent_03;
 
         float speed = 10f;
 
@@ -21,6 +22,7 @@ namespace MortiseFrame.Compass.Sample {
 
             InitAgent(agent_01);
             InitAgent(agent_02);
+            InitAgent(agent_03);
 
         }
 
@@ -35,24 +37,24 @@ namespace MortiseFrame.Compass.Sample {
             agent.isStop = true;
         }
 
-        void TickAgent(NavAgentSample agent, Transform end) {
+        void TickAgent(NavAgentSample agent) {
+
             if (agent.isStop) {
                 return;
             }
 
-            var startPos = agent.transform.position;
-            var endPos = end.position;
+            var endPos = agent.Target.position;
 
-            var path = agent.Compass.FindPath(agent.Map, startPos, endPos, agentSize);
-            agent.SetPath(path);
+            if (agent.Path == null || agent.Path.Count == 0 || agent.CurrentPathIndex >= agent.Path.Count
+                || (agent.LastTargetPos != null && Vector2.Distance(agent.LastTargetPos.Value, endPos) > 0.01f)) {
+                var startPos = agent.transform.position;
 
-            if (path == null || path.Count == 0 || agent.CurrentPathIndex >= agent.Path.Count) {
-                agent.isStop = true;
-                OnReach(agent);
-                return;
+                var path = agent.Compass.FindPath(agent.Map, startPos, endPos, agentSize);
+                agent.SetPath(path);
+                agent.SetLastTargetPos(endPos);
             }
 
-            if (path == null || path.Count == 0 || agent.CurrentPathIndex >= agent.Path.Count) {
+            if (agent.Path == null || agent.Path.Count == 0 || agent.CurrentPathIndex >= agent.Path.Count) {
                 agent.isStop = true;
                 OnReach(agent);
                 return;
@@ -61,19 +63,23 @@ namespace MortiseFrame.Compass.Sample {
             var currentPos = agent.transform.position;
             var nextPos = agent.Path[agent.CurrentPathIndex].GetPos(model.tm.MPU, model.tm.LocalOffset);
             float step = speed * Time.deltaTime;
+            // float step = speed * Time.fixedDeltaTime / 4;
 
             var dir = new Vector2(nextPos.x - currentPos.x, nextPos.y - currentPos.y).normalized;
             agent.transform.position = AddVector2ToPos(dir * step, currentPos);
 
+            currentPos = agent.transform.position;
             if (Vector2.Distance(currentPos, nextPos) <= 0.05f) {
                 agent.AddCurrentPathIndex();
             }
+
         }
 
         void Update() {
 
-            TickAgent(agent_01, agent_02.transform);
-            TickAgent(agent_02, agent_01.transform);
+            TickAgent(agent_01);
+            TickAgent(agent_02);
+            TickAgent(agent_03);
 
         }
 
