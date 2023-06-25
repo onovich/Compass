@@ -18,11 +18,29 @@ namespace MortiseFrame.Compass.Sample {
 
         public float agentSize = 1f;
 
+        public Transform shadow_agent;
+        public Transform shadow_end;
+
+        Map2D map;
+        bool isInit;
+
         void Awake() {
 
+            isInit = true;
+
             InitAgent(agent_01);
-            InitAgent(agent_02);
-            InitAgent(agent_03);
+            // InitAgent(agent_02);
+            // InitAgent(agent_03);
+
+            map = new Map2D(model.tm.CellCount.x, model.tm.CellCount.y, 1000, out var node2DPool, model.tm.GetPassableValue, model.tm.GetCapacityValue);
+
+            var startPos = agent_01.transform.position;
+            var endPos = agent_01.Target.position;
+            var agentRealSize = agentSize * model.tm.MPU;
+            var startNode = MathUtil.Pos2Node(startPos, model.tm.MPU, model.tm.LocalOffset, map);
+            var endNode = MathUtil.Pos2Node(endPos, model.tm.MPU, model.tm.LocalOffset, map);
+
+            Debug.Log($"startNode.X:{startNode.X}, startNode.Y:{startNode.Y};  endNode.X:{endNode.X}, endNode.Y:{endNode.Y}");
 
         }
 
@@ -46,13 +64,11 @@ namespace MortiseFrame.Compass.Sample {
             var endPos = agent.Target.position;
             agent.ResetPathIndex();
 
-            if (agent.Path == null || agent.Path.Count == 0 || agent.CurrentPathIndex >= agent.Path.Count
-                || (agent.LastTargetPos != null && Vector2.Distance(agent.LastTargetPos.Value, endPos) > 0.01f)) {
+            {
                 var startPos = agent.transform.position;
                 var agentRealSize = agentSize * model.tm.MPU;
                 var path = agent.Compass.FindPath(agent.Map, startPos, endPos, agentRealSize);
                 agent.SetPath(path);
-                agent.SetLastTargetPos(endPos);
             }
 
             if (agent.Path == null || agent.Path.Count == 0 || agent.CurrentPathIndex >= agent.Path.Count) {
@@ -62,13 +78,14 @@ namespace MortiseFrame.Compass.Sample {
             }
 
             var currentPos = agent.transform.position;
-            var nextPos = agent.Path[agent.CurrentPathIndex].GetPos(model.tm.MPU, model.tm.LocalOffset);
+            var cellSize = new Vector2(1 / model.tm.MPU, 1 / model.tm.MPU);
+            var nextPos = agent.Path[agent.CurrentPathIndex].GetPos(model.tm.MPU, model.tm.LocalOffset, cellSize);
             float step = speed * Time.fixedDeltaTime;
             // float step = speed * Time.fixedDeltaTime / 4;
 
             var currentIndex = MathUtil.Pos2Index(currentPos, model.tm.MPU, model.tm.LocalOffset, agent.Map);
             var nextIndex = MathUtil.Pos2Index(nextPos, model.tm.MPU, model.tm.LocalOffset, agent.Map);
-            if (Vector2.Distance(currentIndex, nextIndex) <= 1f) {
+            if (Vector2.Distance(currentIndex, nextIndex) <= .05f) {
                 agent.AddCurrentPathIndex();
             }
 
@@ -80,8 +97,26 @@ namespace MortiseFrame.Compass.Sample {
         void FixedUpdate() {
 
             TickAgent(agent_01);
-            TickAgent(agent_02);
-            TickAgent(agent_03);
+            // TickAgent(agent_02);
+            // TickAgent(agent_03);
+            TickShadow();
+
+        }
+
+        void TickShadow() {
+
+            var startPos = agent_01.transform.position;
+            var endPos = agent_01.Target.position;
+            var agentRealSize = agentSize * model.tm.MPU;
+            var startNode = MathUtil.Pos2Node(startPos, model.tm.MPU, model.tm.LocalOffset, map);
+            var endNode = MathUtil.Pos2Node(endPos, model.tm.MPU, model.tm.LocalOffset, map);
+            var cellSize = new Vector2(1 / model.tm.MPU, 1 / model.tm.MPU);
+
+            var start = startNode.GetPos(model.tm.MPU, model.tm.LocalOffset, cellSize);
+            var end = endNode.GetPos(model.tm.MPU, model.tm.LocalOffset, cellSize);
+
+            shadow_agent.position = start;
+            shadow_end.position = end;
 
         }
 
@@ -90,6 +125,27 @@ namespace MortiseFrame.Compass.Sample {
             var y = delta.y + pos.y;
             var z = pos.z;
             return new Vector3(x, y, z);
+        }
+
+        void OnDrawGizmos() {
+
+            if (!isInit) {
+                return;
+            }
+
+            for (int i = 0; i < model.tm.CellCount.x; i++) {
+                for (int j = 0; j < model.tm.CellCount.y; j++) {
+                    var cellSize = new Vector2(1 / model.tm.MPU, 1 / model.tm.MPU);
+                    var pos = map.Nodes[i, j].GetPos(model.tm.MPU, model.tm.LocalOffset, cellSize);
+                    var index = new Vector2Int(i, j);
+                    Gizmos.color = Color.green;
+                    if (!model.tm.GetPassableValue(index)) {
+                        Gizmos.color = Color.red;
+                    }
+                    Gizmos.DrawWireCube(pos, Vector3.one * model.tm.MPU);
+                }
+            }
+
         }
 
     }

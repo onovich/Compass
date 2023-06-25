@@ -12,7 +12,9 @@ namespace MortiseFrame.Compass {
         readonly int[] dy = { 0, 0, -1, 1, -1, 1, -1, 1 };
         readonly int[] cost = { 10, 10, 10, 10, 14, 14, 14, 14 };
         readonly int mpu;
+        public int Mpu => mpu;
         readonly Vector2 localOffset;
+        public Vector2 LocalOffset => localOffset;
         readonly Node2DPool nodePool;
 
         // 回调

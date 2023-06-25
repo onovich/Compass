@@ -35,12 +35,18 @@ namespace MortiseFrame.Compass.Sample {
         public void AddCurrentPathIndex() => currentPathIndex += 1;
         public void ResetPathIndex() => currentPathIndex = 0;
 
-        // Add a property to remember the last target position
-        Vector2? lastTargetPos = null;
-        public Vector2? LastTargetPos => lastTargetPos;
-        public void SetLastTargetPos(Vector2? value) => lastTargetPos = value;
-
         public bool isStop = false;
+
+        public Vector2Int indexPos;
+
+        void Update() {
+
+            var pos = transform.position;
+            var localOffset = compass.LocalOffset;
+            var mpu = compass.Mpu;
+            this.indexPos = MathUtil.Pos2Index(pos, mpu, localOffset, map);
+
+        }
 
     }
 
