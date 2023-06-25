@@ -22,6 +22,7 @@ namespace MortiseFrame.Compass.Sample {
         public Transform shadow_end;
 
         Map2D map;
+        Compass2D compass;
         bool isInit;
 
         void Awake() {
@@ -33,6 +34,7 @@ namespace MortiseFrame.Compass.Sample {
             // InitAgent(agent_03);
 
             map = new Map2D(model.tm.CellCount.x, model.tm.CellCount.y, 1000, out var node2DPool, model.tm.GetPassableValue, model.tm.GetCapacityValue);
+            compass = new Compass2D(model.tm.MPU, node2DPool, model.tm.LocalOffset, HeuristicType.Euclidean);
 
             var startPos = agent_01.transform.position;
             var endPos = agent_01.Target.position;
@@ -81,13 +83,9 @@ namespace MortiseFrame.Compass.Sample {
             var cellSize = new Vector2(1 / model.tm.MPU, 1 / model.tm.MPU);
             var nextPos = agent.Path[agent.CurrentPathIndex].GetPos(model.tm.MPU, model.tm.LocalOffset, cellSize);
             float step = speed * Time.fixedDeltaTime;
-            // float step = speed * Time.fixedDeltaTime / 4;
 
             var currentIndex = MathUtil.Pos2Index(currentPos, model.tm.MPU, model.tm.LocalOffset, agent.Map);
             var nextIndex = MathUtil.Pos2Index(nextPos, model.tm.MPU, model.tm.LocalOffset, agent.Map);
-            if (Vector2.Distance(currentIndex, nextIndex) <= .05f) {
-                agent.AddCurrentPathIndex();
-            }
 
             var dir = new Vector2(nextPos.x - currentPos.x, nextPos.y - currentPos.y).normalized;
             agent.transform.position = AddVector2ToPos(dir * step, currentPos);
@@ -144,6 +142,13 @@ namespace MortiseFrame.Compass.Sample {
                     }
                     Gizmos.DrawWireCube(pos, Vector3.one * model.tm.MPU);
                 }
+            }
+
+            var path = compass.FindPath(map, agent_01.transform.position, agent_01.Target.position, agentSize * model.tm.MPU);
+            for (int i = 1; i < path.Count; i++) {
+                var current = path[i];
+                var last = path[i - 1];
+                Gizmos.DrawLine(current.GetPos(model.tm.MPU, model.tm.LocalOffset, new Vector2(1 / model.tm.MPU, 1 / model.tm.MPU)), last.GetPos(model.tm.MPU, model.tm.LocalOffset, new Vector2(1 / model.tm.MPU, 1 / model.tm.MPU)));
             }
 
         }

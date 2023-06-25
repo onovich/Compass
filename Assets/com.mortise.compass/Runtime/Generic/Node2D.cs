@@ -56,8 +56,8 @@ namespace MortiseFrame.Compass {
 
         public Vector2 GetPos(int mpu, Vector2 localOffset, Vector2 cellSize) {
 
-            var posX = x / mpu + localOffset.x + cellSize.x / 2;
-            var posY = y / mpu + localOffset.y + cellSize.y / 2;
+            var posX = x / (float)mpu + localOffset.x + cellSize.x / 2;
+            var posY = y / (float)mpu + localOffset.y + cellSize.y / 2;
 
             return new Vector2(posX, posY);
 
@@ -65,8 +65,8 @@ namespace MortiseFrame.Compass {
 
         public Vector3 GetPos3D(int mpu, Vector2 localOffset, Vector2 cellSize) {
 
-            var posX = x / mpu + localOffset.x + cellSize.x / 2;
-            var posY = y / mpu + localOffset.y + cellSize.y / 2;
+            var posX = x / (float)mpu + localOffset.x + cellSize.x / 2;
+            var posY = y / (float)mpu + localOffset.y + cellSize.y / 2;
             var posZ = 0;
             return new Vector3(posX, posY, posZ);
 

@@ -84,7 +84,7 @@ namespace MortiseFrame.Compass {
                     if (i >= 4) { // i >= 4 表示现在是对角线移动
                         var neighbour1 = map.Nodes[currentNode.X + dx[i], currentNode.Y];
                         var neighbour2 = map.Nodes[currentNode.X, currentNode.Y + dy[i]];
-                        if (neighbour1.Capacity < agentRealSize || neighbour2.Capacity < agentRealSize) {
+                        if (neighbour1.Capacity < agentRealSize || neighbour2.Capacity < agentRealSize || !neighbour1.Walkable || !neighbour2.Walkable) {
                             continue;
                         }
                     }
