@@ -21,8 +21,8 @@ namespace MortiseFrame.Compass.Sample {
         void Awake() {
 
             InitAgent(agent_01);
-            InitAgent(agent_02);
-            InitAgent(agent_03);
+            // InitAgent(agent_02);
+            // InitAgent(agent_03);
 
         }
 
@@ -80,8 +80,8 @@ namespace MortiseFrame.Compass.Sample {
         void Update() {
 
             TickAgent(agent_01);
-            TickAgent(agent_02);
-            TickAgent(agent_03);
+            // TickAgent(agent_02);
+            // TickAgent(agent_03);
 
         }
 
