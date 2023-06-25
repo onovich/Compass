@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 1098540283955542409}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 1}
+  m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7393756275093366530}
@@ -216,7 +216,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   model: {fileID: 11400000, guid: 4b97ffd210733ae4989e4c5babe2f88c, type: 2}
-  UnitCount: {x: 10, y: 10}
+  UnitCount: {x: 4, y: 4}
   MPU: 1
   calculateCapacity: 1
   maxCapacity: 10

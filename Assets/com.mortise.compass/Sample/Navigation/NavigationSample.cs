@@ -63,11 +63,11 @@ namespace MortiseFrame.Compass.Sample {
 
             var currentPos = agent.transform.position;
             var nextPos = agent.Path[agent.CurrentPathIndex].GetPos(model.tm.MPU, model.tm.LocalOffset);
-            float step = speed * Time.deltaTime;
+            float step = speed * Time.fixedDeltaTime;
             // float step = speed * Time.fixedDeltaTime / 4;
 
-            var currentIndex = MathUtil.Pos2Index(currentPos, model.tm.MPU, model.tm.LocalOffset);
-            var nextIndex = MathUtil.Pos2Index(nextPos, model.tm.MPU, model.tm.LocalOffset);
+            var currentIndex = MathUtil.Pos2Index(currentPos, model.tm.MPU, model.tm.LocalOffset, agent.Map);
+            var nextIndex = MathUtil.Pos2Index(nextPos, model.tm.MPU, model.tm.LocalOffset, agent.Map);
             if (Vector2.Distance(currentIndex, nextIndex) <= 1f) {
                 agent.AddCurrentPathIndex();
             }
@@ -77,7 +77,7 @@ namespace MortiseFrame.Compass.Sample {
 
         }
 
-        void Update() {
+        void FixedUpdate() {
 
             TickAgent(agent_01);
             TickAgent(agent_02);

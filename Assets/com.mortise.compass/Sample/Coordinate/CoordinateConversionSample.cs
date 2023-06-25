@@ -14,7 +14,8 @@ namespace MortiseFrame.Compass.Sample {
             var pos = transform.position;
             var mpu = compassSampleSO.tm.MPU;
             var offset = compassSampleSO.tm.LocalOffset;
-            this.index = MathUtil.Pos2Index(pos, mpu, offset);
+            var map = GetComponent<NavAgentSample>().Map;
+            this.index = MathUtil.Pos2Index(pos, mpu, offset, map);
 
         }
 
