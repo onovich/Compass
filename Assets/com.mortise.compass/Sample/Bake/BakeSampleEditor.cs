@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEditor;
 using MortiseFrame.Modifier.Toaster;
@@ -86,3 +88,5 @@ namespace MortiseFrame.Compass.Sample {
     }
 
 }
+
+#endif
