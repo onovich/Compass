@@ -11,6 +11,13 @@
         "NewLinesForBracesInAccessors": false,
         "NewLineForElse": false,
         "NewLineForCatch": false,
-        "NewLineForFinally": false
+        "NewLineForFinally": false,
+        "newLine": "\n",
+        "useTabs": false,
+        "tabSize": 4,
+        "indentationSize": 4,
+        "NewLineForMembersInObjectInit": false,
+        "NewLineForMembersInAnonymousTypes": false,
+        "NewLineForClausesInQuery": false
     }
 }
