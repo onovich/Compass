@@ -27,9 +27,18 @@ namespace MortiseFrame.Compass.Sample {
 
         // Visible
         [Header("可视化 ------------------------------------------------------------")]
+        [Header("显示大网格")] public bool showLargeGrid = true;
         [Header("显示网格")] public bool showGrid = true;
         [Header("显示障碍物")] public bool showObstacle = true;
-        [Header("显示通行度")] public bool showCapacity = true;
+        [Header("显示通行度")] public bool showCapacity = false;
+        [Header("显示真实通行度")] public bool showRealCapacity = true;
+
+        [Header("颜色 ------------------------------------------------------------")]
+        [Header("大网格颜色")] public Color largeGridColor = new Color(1f, 0.5f, 0f, 0.1f);
+        [Header("网格颜色")] public Color gridColor = new Color(1f, 1f, 1f, 0.02f);
+        [Header("障碍物颜色")] public Color obstacleColor = Color.red;
+        [Header("通行度颜色")] public Color capacityColor = Color.white;
+        [Header("真实通行度颜色")] public Color realCapacityColor = Color.white;
 
         [ContextMenu("Bake")]
         void Bake() {
@@ -75,13 +84,16 @@ namespace MortiseFrame.Compass.Sample {
 
         void OnDrawGizmos() {
 
+            GizmosHelper.DrawLargeGrid(showLargeGrid, model.tm.CellSize, model.tm.CellCount, model.tm.LocalOffset, model.tm, largeGridColor);
+
             if (!isBaked) {
                 return;
             }
 
-            GizmosHelper.DrawGrid(showGrid, model.tm.CellSize, model.tm.CellCount, model.tm.LocalOffset, model.tm);
-            GizmosHelper.DrawObstacle(showObstacle, model.tm.CellSize, model.tm.CellCount, model.tm.LocalOffset, model.tm);
-            GizmosHelper.DrawCapacity(showCapacity, model.tm.CellSize, model.tm.CellCount, model.tm.LocalOffset, model.tm);
+            GizmosHelper.DrawGrid(showGrid, model.tm.CellSize, model.tm.CellCount, model.tm.LocalOffset, model.tm, gridColor);
+            GizmosHelper.DrawObstacle(showObstacle, model.tm.CellSize, model.tm.CellCount, model.tm.LocalOffset, model.tm, obstacleColor);
+            GizmosHelper.DrawCapacityTest(showCapacity, model.tm.CellSize, model.tm.CellCount, model.tm.LocalOffset, model.tm, capacityColor);
+            GizmosHelper.DrawRealCapacity(showRealCapacity, model.tm.CellSize, model.tm.CellCount, model.tm.LocalOffset, model.tm, realCapacityColor);
 
         }
 
