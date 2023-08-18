@@ -140,7 +140,7 @@ namespace MortiseFrame.Compass.Sample {
                     if (!model.tm.GetPassableValue(index)) {
                         Gizmos.color = Color.red;
                     }
-                    Gizmos.DrawWireCube(pos, Vector3.one * model.tm.MPU);
+                    Gizmos.DrawWireCube(pos, Vector2.one * model.tm.MPU);
                 }
             }
 
