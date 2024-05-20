@@ -1,6 +1,6 @@
 # Compass
-Compass is a pathfinding library and one of the "pathfinding trio" (the other two being the baking tool Toaster and the intersection detection library Knot). <br/>
-**Compass 是一个寻路库，是"寻路三件套"之一（另外两个是：烘焙工具 Toaster、交叉检测库 Knot）。**
+Compass is a pathfinding library and one of the "pathfinding trio" (the other two being the baking tool [Toaster](https://github.com/onovich/Toaster) and the intersection detection library [Knot](https://github.com/onovich/Knot)). <br/>
+**Compass 是一个寻路库，是"寻路三件套"之一（另外两个是：烘焙工具 [Toaster](https://github.com/onovich/Toaster)、交叉检测库 [Knot](https://github.com/onovich/Knot)）。**
 
 # Readiness
 It is one of my early works, now seen as full of flaws, and I plan to rewrite it when I have the time.<br/>
